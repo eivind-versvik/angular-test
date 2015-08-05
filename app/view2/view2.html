@@ -1,0 +1,76 @@
+<p>This is the partial for view 2.</p>
+
+<section id="todoapp">
+
+
+  <div
+          isteven-multi-select
+          input-model="vm.modernBrowsers"
+          output-model="vm.outputBrowsers"
+          button-label="name"
+          item-label="name"
+          tick-property="ticked"
+          helper-elements=""
+          >
+  </div>
+
+    <select ng-model="vm.eventType">
+      <option selected value="key">Function Key (DAK)</option>
+      <option value="endpoint">Endpoint Event</option>
+    </select>
+    {{ vm.newEventItem }}
+  <button ng-click="vm.addNewEvent()">
+    Create Event Condition
+  </button>
+
+  <dl ng-if="vm.eventType == 'key'">
+    <dt>Key Number:</dt>
+    <dd>
+      <select ng-model="vm.newevent.condition.key.kid">
+        <option value="">Unused</option>
+        <option value="p1">Key 1</option>
+        <option value="p2">Key 2</option>
+      </select>
+    </dd>
+    <dt>Key State:</dt>
+    <dd>
+      <select ng-model="vm.newevent.condition.key.state">
+        <option value="">Unused</option>
+        <option value="on">Press</option>
+        <option value="off">Release</option>
+      </select>
+    </dd>
+  </dl>
+
+  <dl ng-if="vm.eventType == 'endpoint'">
+    <dt>Endpoint State:</dt>
+    <dd>
+      <button ng-click="vm.addUniqeArrayItem( vm.newevent.condition.endpoint.state, endp_state )">
+        Add
+      </button>
+      <select ng-model="endp_state">
+        <option value="">Unused</option>
+        <option value="idle">Idle</option>
+        <option value="not_registered">Not Registered</option>
+        <option value="call">Call</option>
+      </select>
+      <label ng-repeat="name in vm.newevent.condition.endpoint.state" for="{{name}}"></label>
+        {{name}}
+    </dd>
+  </dl>
+  <label>
+
+  </label>
+
+
+</section>
+<footer id="info">
+  <p>Double-click to edit a todo</p>
+  <p>Credits:
+    <a href="http://twitter.com/cburgdorf">Christoph Burgdorf</a>,
+    <a href="http://ericbidelman.com">Eric Bidelman</a>,
+    <a href="http://jacobmumm.com">Jacob Mumm</a>
+    <a href="http://igorminar.com">Igor Minar</a> and
+    <a href="http://zamboch.blogspot.com">Pavel Savara</a>
+  </p>
+</footer>
