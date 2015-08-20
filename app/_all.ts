@@ -8,5 +8,5 @@
 /// <reference path='interfaces/ITodoStorage.ts' />
 /// <reference path='app.ts' />
 /// <reference path='view1/View1Ctrl.ts' />
-/// <reference path='view2/SipEventCtrl.ts' />
+/// <reference path='view2/EventCtrl.ts' />
 

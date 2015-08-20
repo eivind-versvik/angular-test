@@ -33,7 +33,7 @@ var myApp;
     myApp.addConfig(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/view2', {
             templateUrl: 'view2/view2.html',
-            controller: _myApp.SipEventCtrl
+            controller: _myApp.EventCtrl
         });
         $routeProvider.when('/view1', {
             templateUrl: 'view1/view1.html',
