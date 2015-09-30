@@ -1,40 +1,27 @@
 <section id="eventconfig">
 
+
+
     <h3>Trigger</h3>
+
+
     <ul class="list-inline">
         <li>
-            <div
-                    isteven-multi-select
-                    input-model="vm.triggerSelect.model"
-                    output-model="vm.triggerSelect.out"
-                    button-label="name"
-                    item-label="name"
-                    tick-property="ticked"
-                    helper-elements=""
-                    translation="vm.triggerSelect.langState"
-                    selection-mode="single"
-                    on-item-click="vm.onTriggerChanged( data )"
-                    >
-            </div>
+            <dropdown-multiselect
+                    label="vm.triggerSelect.label" select-mode="singel"
+                    input-model="vm.triggerSelect.model" model="vm.selected_items"
+                    on-click="vm.onTriggerChanged(data)"
+            </dropdown-multiselect>
         </li>
     </ul>
 
     <ul class="list-inline" ng-repeat="array in vm.eventTrigger.fullarray">
-        <li ng-repeat="selectclass in array">
-            <div
-                    isteven-multi-select
-                    input-model="selectclass.model"
-                    output-model="selectclass.out"
-                    button-label="name"
-                    item-label="name"
-                    tick-property="ticked"
-                    helper-elements=""
-                    translation="selectclass.langState"
-
-                    >
-                <!-- selection-mode="single" -->
-            </div>
-
+        <li><h4>{{ array.id }}</h4></li>
+        <li ng-repeat="selectclass in array.array">
+            <dropdown-multiselect
+                    label="selectclass.label" select-mode="multi"
+                    input-model="selectclass.model" model="selectclass.out"
+            </dropdown-multiselect>
         </li>
     </ul>
 
@@ -42,38 +29,21 @@
     <h3>Filter</h3>
     <ul class="list-inline">
         <li>
-            <div
-                    isteven-multi-select
-                    input-model="vm.filterSelect.model"
-                    output-model="vm.filterSelect.out"
-                    button-label="name"
-                    item-label="name"
-                    tick-property="ticked"
-                    helper-elements=""
-                    translation="vm.filterSelect.langState"
-                    selection-mode="single"
-                    on-item-click="vm.onFilterChanged( data )"
-                    >
-            </div>
+            <dropdown-multiselect
+                    label="vm.filterSelect.label" select-mode="singel"
+                    input-model="vm.filterSelect.model" model="vm.filterSelect.out"
+                    on-click="vm.onFilterChanged(data)"
+            </dropdown-multiselect>
         </li>
     </ul>
 
     <ul class="list-inline" ng-repeat="array in vm.eventFilter.fullarray">
-        <li ng-repeat="selectclass in array">
-            <div
-                    isteven-multi-select
-                    input-model="selectclass.model"
-                    output-model="selectclass.out"
-                    button-label="name"
-                    item-label="name"
-                    tick-property="ticked"
-                    helper-elements=""
-                    translation="selectclass.langState"
-
-                    >
-                <!-- selection-mode="single" -->
-            </div>
-
+        <li><h4>{{ array.id }}</h4></li>
+        <li ng-repeat="selectclass in array.array">
+            <dropdown-multiselect
+                    label="selectclass.label" select-mode="multi"
+                    input-model="selectclass.model" model="selectclass.out"
+            </dropdown-multiselect>
         </li>
     </ul>
 
@@ -81,40 +51,29 @@
     <h3>Action</h3>
     <ul class="list-inline">
         <li>
-            <div
-                    isteven-multi-select
-                    input-model="vm.actionSelect.model"
-                    output-model="vm.actionSelect.out"
-                    button-label="name"
-                    item-label="name"
-                    tick-property="ticked"
-                    helper-elements=""
-                    translation="vm.actionSelect.langState"
-                    selection-mode="single"
-                    on-item-click="vm.onActionChanged( data )"
-                    >
-            </div>
+            <dropdown-multiselect
+                    label="vm.actionSelect.label" select-mode="singel"
+                    input-model="vm.actionSelect.model" model="vm.actionSelect.out"
+                    on-click="vm.onActionChanged(data)"
+            </dropdown-multiselect>
         </li>
     </ul>
 
     <ul class="list-inline" ng-repeat="array in vm.eventAction.fullarray">
-        <li ng-repeat="selectclass in array">
-            <div
-                    isteven-multi-select
-                    input-model="selectclass.model"
-                    output-model="selectclass.out"
-                    button-label="name"
-                    item-label="name"
-                    tick-property="ticked"
-                    helper-elements=""
-                    translation="selectclass.langState"
-
-                    >
-                <!-- selection-mode="single" -->
-            </div>
-
+        <li ng-repeat="selectclass in array.array">
+            <dropdown-multiselect
+                    label="selectclass.label" select-mode="multi"
+                    input-model="selectclass.model" model="selectclass.out"
+            </dropdown-multiselect>
         </li>
     </ul>
+
+    <br>
+    <button class="btn" ng-click="vm.save()">Save</button>
+    <br>
+    {{ vm.eventdata | json}}
+    <br>
+    {{ vm.triggerdata | json}}
 
 </section>
 

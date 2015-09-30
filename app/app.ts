@@ -36,7 +36,7 @@ module Base
 module myApp
 {
     'use strict';
-    var myApp = new Base.Module('myApp', ['ngRoute', 'myApp.version', 'isteven-multi-select']);
+    var myApp = new Base.Module('myApp', ['ngRoute', 'myApp.version', 'isteven-multi-select', 'dropdown-multiselect']);
 
     myApp.addService('todoStorage', TodoStorage);
     // myApp.addDirective('isteven-multi-select');

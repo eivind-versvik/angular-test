@@ -33,6 +33,117 @@
 
 'use strict'
 
+angular.module('dropdown-multiselect', ['ng']).directive('dropdownMultiselect', [ '$document', '$timeout', function($document, $timeout){
+    return {
+        restrict: 'E',
+        scope:{
+            model: '=',
+            options: '=',
+            label: '=',
+            inputModel: '=',
+            onClick: '&',
+            pre_selected: '=preSelected'
+        },
+        template: "<div class='dropdown' data-ng-class='{open: open}'>"+
+        "<button aria-haspopup='true' class='btn btn-default dropdown-toggle' type='button' data-ng-click='open=!open;openDropdown()'>{{varLabel}}&nbsp;<span class='caret'></span></button>"+
+        "<ul class='dropdown-menu' aria-labelledby='dropdownMenu'>" +
+            //"<li><input type='text'/></li>" +
+            //"<li class='divider'></li>" +
+            "<li data-ng-repeat='imodel in inputModel'> <a href='' data-ng-click='setSelectedItem()'>{{imodel.name}}<span data-ng-class='isChecked(imodel.data)'></span></a></li>" +
+        "</ul>" +
+        "</div>" ,
+
+
+        link: function(scope, element, attr){
+            console.log(scope.label);
+            scope.varLabel = scope.label;
+            scope.selectMode = 'MULTI';
+            if(attr.selectMode)
+                scope.selectMode = attr.selectMode.toUpperCase();
+
+            $document.bind('click', function(event){
+                var isClickedElementChildOfPopup = jQuery.contains(element[0].children[0], event.target)
+                if (isClickedElementChildOfPopup)
+                    return;
+                scope.open = false;
+                scope.$apply()
+            });
+        },
+
+        controller: function($scope){
+
+            $scope.openDropdown = function(){
+                $scope.selected_items = [];
+                if($scope.inputModel == undefined) {
+                    console.log('err pre selected undefined');
+                    return;
+                }
+
+                for(var i=0; i<$scope.inputModel.length; i++){
+                    $scope.selected_items.push($scope.inputModel[i].data);
+                }
+            };
+            $scope.setSelectedItem = function(){
+                var id = this.imodel.data;
+
+                if($scope.selectMode == 'SINGEL')
+                    $scope.model = [];
+
+                var index = $scope.model.indexOf(id);
+                if(index < 0)
+                {
+                    $scope.model.push(id);
+                }
+                else
+                    $scope.model.splice( jQuery.inArray(id, $scope.model), 1 );
+
+                // change label text if we have selected items
+                if($scope.model.length > 0 && $scope.selectMode == 'MULTI')
+                {
+                    $scope.varLabel = '';
+                    for(var a = 0; a < $scope.inputModel.length; a++)
+                    {
+                        for(var i=0; i<$scope.model.length; i++){
+                            if($scope.inputModel[a].data == $scope.model[i])
+                            {
+                                if($scope.varLabel.length > 0)
+                                    $scope.varLabel = $scope.varLabel + ', ' + $scope.inputModel[a].name;
+                                else
+                                    $scope.varLabel = $scope.inputModel[a].name;
+                            }
+                        }
+                    }
+                }
+                else
+                    $scope.varLabel = $scope.label;
+
+
+                var copy = angular.copy( this.imodel );
+                if ( copy !== null ) {
+                    $timeout( function() {
+                        $scope.onClick( { data: copy } );
+                        copy = null;
+                    }, 0 );
+                }
+
+                if($scope.selectMode == 'SINGEL')
+                    $scope.open = false;
+
+                return false;
+            };
+
+            $scope.isChecked = function (id) {
+                var index = $scope.model.indexOf(id);
+                if (index > -1) {
+                    return 'glyphicon glyphicon-ok pull-right';
+                }
+                return false;
+            };
+        }
+    }
+}]);
+
+
 angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect' , [ '$sce', '$timeout', '$templateCache', function ( $sce, $timeout, $templateCache ) {
     return {
         restrict:

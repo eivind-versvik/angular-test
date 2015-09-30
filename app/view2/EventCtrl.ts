@@ -17,15 +17,20 @@ module myApp {
         private langState: any;
         private model: any;
         private out: any;
+        private label: string;
+        private id: string;
 
-        constructor(defaultText: string)
+        constructor(defaultText: string, id: string)
         {
             this.langState = {};
+            this.label = defaultText;
             this.langState.nothingSelected = defaultText;
             this.langState.search = 'Search';
             this.langState.reset = 'Reset';
             this.langState.selectNone = 'Select None';
             this.langState.selectAll = 'Select All';
+            this.out = [];
+            this.id = id;
         }
 
         public setModel(inModel: any)
@@ -35,24 +40,26 @@ module myApp {
 
         public toJson()
         {
-            console.log(this.out);
+            var jsonv = {};
+            jsonv[this.id] = this.out;
+            return jsonv;
         }
     }
 
     enum EventType {call, gpi, key, endpoint};
-    enum EventActionType {setutp_call};
+    enum EventActionType {setup_call};
 
     export class ToEvent {
         public static getEventActionArrayFromType(type:EventActionType) {
             console.log('action ' + type);
-            if (type == EventActionType.setutp_call) {
-                var callDestination = new MultiSelect('Call Destination');
+            if (type == EventActionType.setup_call) {
+                var callDestination = new MultiSelect('Call Destination', 'to');
                 callDestination.setModel([
                     {name: "100", data: "100", ticked: false},
                     {name: "101", data: "101", ticked: false},
                 ]);
 
-                return [callDestination];
+                return { array: [callDestination], id: 'call_setup' };
             }
         }
 
@@ -60,7 +67,7 @@ module myApp {
         {
             if(type == EventType.call)
             {
-                var callState = new MultiSelect('Call State');
+                var callState = new MultiSelect('Call State', 'state');
                 callState.setModel([
                     {	name: "Trying", data:"trying", ticked: false	},
                     {	name: "Alerting", data:"alerting", ticked: false	},
@@ -69,57 +76,57 @@ module myApp {
                     {	name: "Hangup", data:"call_ended",	ticked: false	},
                 ]);
 
-                var callDirection = new MultiSelect('Call Direction');
+                var callDirection = new MultiSelect('Call Direction', 'direction');
                 callDirection.setModel([
                     {	name: "Incoming", data:"incoming",	ticked: false	},
                     {	name: "Outgoing",    data:"outgoing", ticked: false	},
                 ]);
 
-                return [ callState, callDirection ];
+                return { array: [ callState, callDirection ], id: 'call'};
             }
             else if(type == EventType.endpoint)
             {
-                var endpointStateSelect = new MultiSelect('Endpoint State');
+                var endpointStateSelect = new MultiSelect('Endpoint State', 'state');
                 endpointStateSelect.setModel([
                     {	name: "Not Registered", data:"not_registered",	ticked: false	},
                     {	name: "Idle",    data:"idle", ticked: false	},
-                    {	name: "In Call",    data: "in_call",	ticked: false	},
+                    {	name: "Call",    data: "call",	ticked: false	},
                 ]);
 
-                return [ endpointStateSelect ];
+                return { array: [ endpointStateSelect ], id: 'endpoint' };
             }
             else if(type == EventType.gpi)
             {
-                var gpiId = new MultiSelect('GPI ID');
+                var gpiId = new MultiSelect('GPI ID', 'kid');
                 gpiId.setModel([
                     {	name: "GPI 1", data:"gpi1",	ticked: false	},
                     {	name: "GPI 2",    data:"gpi2", ticked: false	},
                     {	name: "GPI 3",    data:"gpi3", ticked: false	},
                 ]);
 
-                var gpiState = new MultiSelect('GPI State');
+                var gpiState = new MultiSelect('GPI State', 'state');
                 gpiState.setModel([
                     {	name: "On", data:"on",	ticked: false	},
                     {	name: "Off",    data:"off", ticked: false	},
                 ]);
 
-               return [ gpiId, gpiState ];
+               return { array: [ gpiId, gpiState ], id: 'gpi'};
             }
             else if(type == EventType.key)
             {
-                var keyIdSelect = new MultiSelect('Key Id');
+                var keyIdSelect = new MultiSelect('Key Id', 'kid');
                 keyIdSelect.setModel([
-                    {	name: "Programmable Key 1", data:"p1",	ticked: false	},
-                    {	name: "Programmable Key 2", data:"p2", ticked: false	},
+                    {	name: "DAK 1", data:"p1",	ticked: false	},
+                    {	name: "DAK 2", data:"p2", ticked: false	},
                 ]);
 
-                var keyStateSelect= new MultiSelect('Key State');
+                var keyStateSelect= new MultiSelect('Key State', 'state');
                 keyStateSelect.setModel([
                     {	name: "Press", data:"on",	ticked: false	},
                     {	name: "Release",    data:"off", ticked: false	},
                 ]);
 
-                return [ keyIdSelect, keyStateSelect ];
+                return { array: [ keyIdSelect, keyStateSelect ], id: 'key' };
             }
 
         }
@@ -134,23 +141,43 @@ module myApp {
 
     export class EventVM {
         private fullarray: any;
+        private id: string;
 
-        constructor() {
+        constructor(id: string) {
             this.fullarray = [];
+            this.id = id;
         }
 
         public toJson()
         {
+            if(!this.id)
+                return;
+            console.log(this.id);
+            var id = this.id;
+            var tmpv = {};
+            tmpv[id] = [];
+
+            //console.log(this.fullarray);
             this.fullarray.forEach(function(multiselectRow) {
-                console.log('Multiselect row start');
-                multiselectRow.forEach(function(multiSelect) {
-                    multiSelect.toJson();
+                var arrayid = {};
+                arrayid[multiselectRow.id] = [];
+                multiselectRow.array.forEach(function(multiSelect) {
+                    var res = multiSelect.toJson();
+                    if(res) {
+                        arrayid[multiselectRow.id].push(multiSelect.toJson());
+                    }
+
                 });
+                tmpv[id].push(arrayid);
+
             });
+
+            return tmpv;
         }
 
         public setEvent(type: any)
         {
+            //console.log(JSON.stringify(type));
             this.fullarray = [];
             this.addEvent(type);
         }
@@ -158,7 +185,9 @@ module myApp {
         public addEvent(type: any)
         {
             this.fullarray.push(type);
-            this.toJson();
+            //console.log(type);
+            //console.log(this.fullarray);
+
         }
     }
 
@@ -182,6 +211,12 @@ module myApp {
         private eventTrigger: EventVM;
         private eventAction: EventVM;
 
+        private triggerdata: any;
+        private eventdata: any;
+
+
+        private selected_items: any;
+
         // $inject annotation.
         // It provides $injector with information about dependencies to be injected into constructor
         // it is better to have it close to the constructor, because the parameters must match in count and type.
@@ -195,7 +230,8 @@ module myApp {
         constructor(
             private $scope: IEventScope
         ) {
-            this.triggerSelect = new MultiSelect('Choose Event Trigger');
+            this.selected_items = [];
+            this.triggerSelect = new MultiSelect('Choose Event Trigger', 'trigger');
             this.triggerSelect.setModel([
                 {	name: "Progammable Key Event (DAK)", data:EventType.key,	ticked: false	},
                 {	name: "Call Event", data:EventType.call,	ticked: false	},
@@ -203,22 +239,22 @@ module myApp {
                 {	name: "Gpi Event",    data:EventType.gpi, ticked: false	},
             ]);
 
-            this.filterSelect = new MultiSelect('Add Event Restriction');
+            this.filterSelect = new MultiSelect('Add Event Restriction', 'restriction');
             this.filterSelect.setModel([
                 {	name: "Add Call Restriction", data:EventType.call,	ticked: false	},
                 {	name: "Add Main State Restriction",    data:EventType.endpoint, ticked: false	},
                 {	name: "Add Gpi Restriction",    data:EventType.gpi, ticked: false	},
             ]);
 
-            this.actionSelect = new MultiSelect('Choose Action');
+            this.actionSelect = new MultiSelect('Choose Action', 'action');
             this.actionSelect.setModel([
-                {	name: "Setup call", data:EventActionType.setutp_call,	ticked: false	},
+                {	name: "Setup call", data:EventActionType.setup_call,	ticked: false	},
             ]);
 
 
-            this.eventFilter = new EventVM();
-            this.eventTrigger = new EventVM();
-            this.eventAction = new EventVM();
+            this.eventFilter = new EventVM('restriction');
+            this.eventTrigger = new EventVM('condition');
+            this.eventAction = new EventVM('action');
             // 'vm' stands for 'view model'. We're adding a reference to the controller to the scope
             // for its methods to be accessible from view / HTML
             $scope.vm = this;
@@ -234,6 +270,7 @@ module myApp {
 
         private onTriggerChanged(data: any)
         {
+            console.log(data);
             this.eventTrigger.setEvent(ToEvent.getEventTriggerArrayFromType(data.data));
         }
 
@@ -259,6 +296,20 @@ module myApp {
             //console.log(item);
             array.push(item);
             console.log(array);
+        }
+
+        private save()
+        {
+            console.log('save');
+            var tmp : any = {};
+            tmp['1'] = this.eventTrigger.toJson();
+            tmp['2'] = this.eventFilter.toJson();
+            tmp['3'] = this.eventAction.toJson();
+            console.log(JSON.stringify(tmp));
+
+            this.eventdata = this.eventFilter.toJson();
+            this.triggerdata = this.eventTrigger.toJson();
+
         }
     }
 
